@@ -1,0 +1,67 @@
+.mission-cards {
+    position: absolute;
+    width: 60%;
+    height: 100%;
+    top: 0px;
+    // z-index: 20;
+    margin: 0px 20%;
+    font-size: 0px;
+
+    .card {
+        position: relative;
+        display: inline-flex;
+        width: 30%;
+        height: 20%;
+        line-height: 60px;
+        white-space: nowrap;
+        text-align: center;
+        font-size: 24px;
+        align-items:center;
+        z-index: 31;
+
+        &.isLeft {
+            // left: 20%;
+            justify-content: flex-start;
+            margin-right: 20%;
+        }
+
+        &.isRight {
+            // right: 20%;
+            justify-content: flex-end;
+            margin-left: 20%;
+        }
+
+        &.isUnuse {
+            // top: 90% !important;
+            position: absolute;
+            top: 95%;
+            left: 0%;
+            align-items: normal;
+
+            >b {
+                border-width: 0px;
+            }
+        }
+
+        >b {
+            position: absolute;
+            width: 60%;
+            height: 50%;
+            text-indent: 100%;
+            overflow: hidden;
+            border: 1px gray dotted;
+
+            &.sended {
+                color: #f94801;
+                background-color: #ffd17d;
+                text-indent: 0%;
+                z-index: 30;
+                border: 1px solid #f94801;
+            }
+
+            &.disable {
+                display: none;
+            }
+        }
+    }
+}

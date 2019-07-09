@@ -1,0 +1,23 @@
+html, body {
+    margin: 0px;
+    padding: 0px;
+    height:100%;
+    overflow: hidden;
+}
+
+#main-app {
+    height: 100%;
+}
+
+.display-inline-vertical {
+    display: inline-block;
+    vertical-align: middle;
+
+    &:after {
+        content: '';
+        display: inline-block;
+        height: 100%;
+        width: 0%;
+        vertical-align: middle;
+    }
+}
