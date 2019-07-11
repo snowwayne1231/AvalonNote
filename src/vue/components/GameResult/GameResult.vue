@@ -21,7 +21,7 @@
             </div>
         </div>
 
-        <div class="game-result-message" v-if="game.resultMessage">
+        <div class="game-result-message" :class="{fail: game.resultsFinal == STATIC.RESULT.FAIL}" v-if="game.resultsFinal != STATIC.RESULT.UNDO">
             {{game.resultMessage}}
         </div>
     </div>

@@ -42,10 +42,50 @@
         .profile-info {
             height: 60%;
             width: 100%;
+            font-size: 0px;
 
             .btn-leader {
                 height: 24px;
                 width: 24px;
+                font-size: 13px;
+            }
+
+            .name {
+                display: flex;
+                font-size: 14px;
+                height: 100%;
+                flex-direction: column;
+
+                >span {
+                    display: flex;
+                    flex-basis: 40%;
+                    align-items: flex-start;
+                    justify-content: center;
+
+                    &:first-child {
+                        flex-basis: 60%;
+                        align-items: flex-end;
+                    }
+                }
+
+                .ball {
+                    display: inline-block;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+
+                    &.good {
+                        background-color: #4a7cff;
+                    }
+
+                    &.bad {
+                        background-color: #ff5454;
+                    }
+
+                    &.both {
+                        background-color: #e997ff;
+                    }
+                }
             }
         }
 
@@ -74,6 +114,11 @@
                 background-color: #fff;
                 transform: rotateX(0deg);
             }
+        }
+
+        .choice {
+            width: 38px;
+            height: 38px;
         }
 
         .role {
@@ -107,29 +152,265 @@
     .game-modal {
 
         .header {
-            line-height: 28px;
-            font-size: 20px;
+            line-height: 44px;
+            font-size: 24px;
             text-align: center;
             border-bottom: 1px solid gray;
+            background-color: #666;
+            color: #00ff51;
+            // color: #fff;
+            // text-decoration: underline;
+            font-style: oblique;
+            text-shadow: 1px 1px 1px #000;
+
+            .close {
+                display: inline-block;
+                position: absolute;
+                height: 40px;
+                width: 40px;
+                top: 0px;
+                right: 0px;
+                color: #fff;
+                font-size: 30px;
+                line-height: 30px;
+            }
         }
         
         .content {
+            height: 100%;
             overflow: auto;
 
-            .inner-content {
-                
+            table {
+                width: 100%;
+
+                th {
+                    text-align: center;
+                }
+
+                td:first-child {
+                    border: 1px solid #333;
+                    text-align: center;
+                    color: #fff;
+                    background-color: gray;
+
+                    &.win {
+                        background-color: blue;
+                    }
+
+                    &.lose {
+                        background-color: red;
+                    }
+                }
             }
         }
 
         .tabs {
             display: flex;
             justify-content: center;
+
+            .btn {
+                border-right: 1px solid gray;
+
+                &:last-child {
+                    border-right-width: 0px;
+                }
+
+                &.active {
+                    background-color: #dcdcdc;
+                }
+            }
         }
 
         .content-vote {
 
-            table {
+            .vote-round {
+                font-size: 12px;
+                display: flex;
+                flex-direction: row;
+                overflow: hidden;
+                border-top: 1px solid #333;
 
+                &.last {
+                    font-size: 16px;
+                    border: 1px solid #560f00;
+                    box-shadow: 1px 1px 3px #000;
+
+                    .vote-go-leader {
+                        color: #ffce71;
+                        background-color: #921900;
+                    }
+                }
+
+                .self {
+                    color: #00ff51 !important;
+                    // text-decoration: underline;
+                    font-style: oblique;
+                    text-shadow: 1px 1px 1px #000;
+                }
+            }
+
+            .vote-go-leader {
+                color: #fff6e4;
+                background-color: #b59b90;
+                flex: 2;
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100px;
+            }
+
+            .vote-go-players {
+                flex: 2;
+
+                .player {
+                    margin: 0px;
+                    padding: 0px;
+                    border-bottom: 1px solid gray;
+
+                    &.leader {
+                        color: #ddd;
+                    }
+                }
+            }
+
+            .vote-go-vote {
+                flex: 1;
+                background-color: #ddd;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-left: 1px solid gray;
+
+                .vote {
+                    display: inline-block;
+                    width: 28px;
+                    height: 28px;
+                    line-height: 28px;
+                    color: #fff;
+                    background-color: #000;
+                    border-radius: 50%;
+                    border: 1px solid #333;
+                    font-size: 12px;
+                    text-align: center;
+
+                    &.agree {
+                        color: #000;
+                        background-color: #fff;
+                    }
+
+                    
+                }
+            }
+        }
+
+        .content-possible {
+
+            .role-possible {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+
+                .role {
+                    flex-basis: 50%;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    height: 48px;
+                    line-height: 48px;
+                    box-sizing: border-box;
+                    border: 0px solid #ffe200;
+                    border-bottom-width: 1px;
+                    color: #ffe200;
+                    text-shadow: 1px 1px 2px #000;
+                    opacity: 0.3;
+
+                    &:nth-child(odd) {
+                        border-right-width: 1px;
+                    }
+
+                    &.good {
+                        background-color: #009fff;
+                    }
+
+                    &.bad {
+                        background-color: red;
+                    }
+
+                    &.both {
+                        background-color: #c900ff;
+                    }
+
+                    &.possible {
+                        opacity: 1;
+                    }
+                }
+            }
+        }
+
+        .content-besend {
+            min-height: 420px;
+            display: flex;
+
+            >div:not(.center) {
+                flex: 1;
+                background-color: #ddd;
+            }
+
+            .center {
+                flex: 2;
+            }
+
+            .player {
+                height: 20%;
+                border: 1px solid gray;
+                box-sizing: border-box;
+
+                &.self {
+                    color: #fff;
+                    background-color: #00ff51;
+                }
+
+                .name {
+                    font-size: 16px;
+                    line-height: 36px;
+                    text-align: center;
+                }
+
+                .voting {
+                    display: flex;
+
+                    >div {
+                        flex: 1;
+                        text-align: center;
+                    }
+
+                    .circle {
+                        display: inline-block;
+                        width: 28px;
+                        height: 28px;
+                        line-height: 28px;
+                        font-size: 13px;
+                        border-radius: 50%;
+                    }
+                }
+
+                .agree {
+
+                    .circle {
+                        color: #000;
+                        background-color: #fff;
+                    }
+                }
+
+                .disagree {
+
+                    .circle {
+                        color: #fff;
+                        background-color: #000;
+                    }
+                }
             }
         }
     }

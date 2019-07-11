@@ -46,9 +46,10 @@ const model = {
         mission: STATIC.WORLD.MISSION['5'],
         round: 1,
         playerNum: 5,
-        players: new Array(5).fill(0).map((ele, idx) => { return { 'name': `Player [${idx+1}]` }; }),
+        players: new Array(5).fill(0).map((ele, idx) => { return { 'name': `Player [${idx+1}]`, 'id': idx, 'goodRatio': 50 }; }),
         tablePlayer: new Array(10).fill(null),
         results: new Array(5).fill(STATIC.RESULT.UNDO),
+        resultsFinal: STATIC.RESULT.UNDO,
         resultMessage: null,
         trackRoundNow: 1,
         tracks: new Array(5).fill(0).map((ele, idx) => {
@@ -69,6 +70,7 @@ const model = {
         leader: -1,
         opening: false,
         order: -1,
+        role_possible: new Array(5).fill(0).map(e => []),
         // Lady of the Lake
     },
     getters: {
@@ -80,6 +82,9 @@ const model = {
         },
         'gameGoPlayerNum': state => {
             return state.mission[state.round - 1];
+        },
+        'gameEnd': state => {
+            return state.resultsFinal != STATIC.RESULT.UNDO;
         },
     },
     actions: {
@@ -109,9 +114,10 @@ const model = {
                     heros,
                     round: 1,
                     playerNum: player,
-                    players: new Array(player).fill(0).map((ele, idx) => { return originPlayers[idx] ? originPlayers[idx] : { 'name': `Player [${idx+1}]` }; }),
+                    players: new Array(player).fill(0).map((ele, idx) => { return originPlayers[idx] ? originPlayers[idx] : { 'name': `Player [${idx+1}]`, 'id': idx, 'goodRatio': 50 }; }),
                     tablePlayer,
                     results: new Array(5).fill(STATIC.RESULT.UNDO),
+                    resultsFinal: STATIC.RESULT.UNDO,
                     resultMessage: null,
                     trackRoundNow: 1,
                     tracks: new Array(5).fill(0).map((ele, idx) => {
@@ -131,12 +137,14 @@ const model = {
                     leader: -1,
                     opening: true,
                     order,
+                    role_possible: new Array(player).fill(0).map(e => []),
                 });
             } else {
                 throw (`GAME_INIT ::: Can Not Specify Player Number As ${player}`);
             }
         },
         'GAME_BACK': (cxt) => {
+            cxt.dispatch('GAME_SAVE_TO_LOCAL');
             cxt.commit('GAME:UPDATE', {
                 opening: false,
             });
@@ -148,6 +156,7 @@ const model = {
         },
         'GAME_LOAD': (cxt) => {
             const json = JSON.parse(window.localStorage.getItem(STATIC.LOCALSTORAGE));
+            console.log('GAME_LOADING', json);
             cxt.commit('GAME:UPDATE', json);
         },
         'GAME_CHOOSE_LEADER': (cxt, {idx}) => {
@@ -193,11 +202,25 @@ const model = {
                 nextTracks[round_idx].go_players = go_players;
                 nextTracks[round_idx].go_leader_idx = save_leader;
 
+                const nextRound = Math.min(5, state.round + 1);
+                let nextFinal = cxt.state.resultsFinal;
+                let nextResultMessage = cxt.state.resultMessage;
+
+                if (nextResults.filter(e => e == STATIC.RESULT.FAIL).length >= 3) {
+                    nextFinal = STATIC.RESULT.FAIL;
+                    nextResultMessage = 'FAIL';
+                } else if (nextResults.filter(e => e == STATIC.RESULT.SUCCESS).length >= 3) {
+                    nextFinal = STATIC.RESULT.SUCCESS;
+                    nextResultMessage = 'King Of Arthur Is Win !';
+                }
+
                 cxt.commit('GAME:UPDATE', {
-                    round: Math.min(5, state.round + 1),
+                    round: nextRound,
                     results: nextResults,
                     trackRoundNow: 1,
                     tracks: nextTracks,
+                    resultsFinal: nextFinal,
+                    resultMessage: nextResultMessage,
                 });
 
                 cxt.dispatch('GAME_SAVE_TO_LOCAL');
@@ -221,6 +244,22 @@ const model = {
         },
         'GAME_SAVE_TO_LOCAL': (cxt) => {
             window && window.localStorage.setItem(STATIC.LOCALSTORAGE, JSON.stringify(cxt.state));
+        },
+        'GAME_TOGGLE_ROLE_POSSIBLE': (cxt, {player_idx, role}) => {
+            const nextPossible = [...cxt.state.role_possible];
+            const ary = nextPossible[player_idx];
+            if (ary) {
+                const aidx = ary.indexOf(role);
+                if (aidx < 0) {
+                    ary.push(role);
+                } else {
+                    ary.splice(aidx, 1);
+                }
+                
+                cxt.commit('GAME:UPDATE', {
+                    role_possible: nextPossible,
+                });
+            }
         },
     },
     mutations: {

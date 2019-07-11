@@ -14,8 +14,12 @@
                 v-for="(i, iidx) in item"
                 @click="onClickCard(idx)"
                 :class="{sended: i.sended, disable: i.disable}"
-                :key="iidx"
-                >I</b>
+                :key="iidx">
+                <span v-if="i.sended">I</span>
+                <p v-else class="round-sended" :class="{show: idx < 10 && item[0] && !item[0].disable}">
+                    <i v-for="(res, ridx) in game.results" :key="ridx" :class="{blue: res == 1, red: res == 2, in: checkInResult(idx, ridx)}"></i>
+                </p>
+            </b>
         </Draggable>
     </div>
 </template>
@@ -48,6 +52,12 @@ export default {
             // console.log('move', evt);
             const list = evt.relatedContext.list.filter(e => e.sended || e.disable);
             return list.length == 0;
+        },
+        checkInResult(cardidx, round) {
+            const track = this.game.tracks[round];
+            const table_idx = this.tableIndexMap[cardidx];
+            const player_idx = this.game.tablePlayer[table_idx];
+            return track && !isNaN(player_idx) && track.go_players.includes(player_idx);
         },
         onClickCard(idx) {
             const unuse = this.missionCardItems.slice(10);

@@ -29,6 +29,11 @@
             // right: 20%;
             justify-content: flex-end;
             margin-left: 20%;
+
+            .round-sended {
+                left: auto;
+                right: 0px;
+            }
         }
 
         &.isUnuse {
@@ -48,7 +53,7 @@
             width: 60%;
             height: 50%;
             text-indent: 100%;
-            overflow: hidden;
+            // overflow: hidden;
             border: 1px gray dotted;
 
             &.sended {
@@ -61,6 +66,40 @@
 
             &.disable {
                 display: none;
+            }
+        }
+
+        .round-sended {
+            display: none;
+            position: absolute;
+            pointer-events: none;
+            width: 30px;
+            height: 6px;
+            top: -6px;
+            left: 0px;
+            background-color: #dcdcdc;
+            margin: 0px;
+            padding: 0px;
+
+            &.show {
+                display: flex;
+            }
+
+            >i {
+                display: inline-block;
+                height: 100%;
+                flex: 1;
+                border-right: 1px dotted gray;
+
+                &.in {
+                    &.blue {
+                        background-color: #4a7cff;
+                    }
+    
+                    &.red {
+                        background-color: #ff5454;
+                    }
+                }
             }
         }
     }

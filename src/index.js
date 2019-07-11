@@ -4,10 +4,12 @@ import Vue from 'vue';
 
 import 'src/scss/main.scss';
 import VModal from 'vue-js-modal';
+import Vue2TouchEvents from 'vue2-touch-events';
 import store from 'src/vuex/storage';
 import app from 'src/vue/main';
 
 Vue.use(VModal);
+Vue.use(Vue2TouchEvents);
 
 
 //config

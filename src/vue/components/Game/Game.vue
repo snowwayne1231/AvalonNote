@@ -12,11 +12,12 @@
         </div>
 
         <div class="game-bottom">
-            <b class="btn btn-back vertical-center" @click="onClickBack">BACK</b>
+            <b class="btn btn-back vertical-center" @click="onClickHome">HOME</b>
             <b class="btn btn-empty vertical-center" ></b>
             <b class="btn btn-empty vertical-center" ></b>
             <b class="btn btn-empty vertical-center" ></b>
-            <b class="btn btn-next vertical-center" @click="onClickNext">NEXT</b>
+            <b class="btn btn-next vertical-center" @click="onClickNext" v-if="!gameEnd">NEXT</b>
+            <b class="btn btn-next vertical-center" v-else></b>
         </div>
 
         <modal class="game-modal" name="modal-winorlose"
@@ -47,14 +48,17 @@ export default {
     },
     computed: {
         ...mapState(['game']),
-        ...mapGetters(['gameVotesNow', 'gameGoPlayerNum']),
+        ...mapGetters(['gameVotesNow', 'gameGoPlayerNum', 'gameEnd']),
     },
     mounted() {
         console.log('game.vue', this);
-
+        console.log('GAME', this.game);
+        // window.addEventListener('touchmove', function(evt) {
+        //     evt.preventDefault();
+        // });
     },
     methods: {
-        onClickBack() {
+        onClickHome() {
             this.$store.dispatch('GAME_BACK');
         },
         onClickNext() {
