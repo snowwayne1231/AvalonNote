@@ -42,6 +42,14 @@ $game-bottom-height: 80px;
             border-width: 0px;
             z-index: 1;
         }
+
+        .btn-save {
+            visibility: hidden;
+
+            &.show {
+                visibility: visible;
+            }
+        }
     }
 
     .game-forward {
@@ -77,6 +85,10 @@ $game-bottom-height: 80px;
             width: 0%;
             vertical-align: middle;
         }
+    }
+
+    .hide {
+        display: none !important;
     }
 }
 

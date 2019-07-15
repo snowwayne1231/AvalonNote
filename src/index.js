@@ -21,6 +21,10 @@ window.env = (key) => {
     return key ? data[key] : data;
 };
 
+window.addEventListener('touchmove', function(evt){
+    evt.preventDefault();
+});
+
 //error handler
 
 //require component

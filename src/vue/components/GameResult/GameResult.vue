@@ -1,5 +1,5 @@
 <template>
-    <div class="game-result">
+    <div class="game-result" :class="{end: gameEnd}">
         <div class="game-result-meta-round">
             <div class="show-error" v-if="error">
                 {{error}}
@@ -21,8 +21,11 @@
             </div>
         </div>
 
-        <div class="game-result-message" :class="{fail: game.resultsFinal == STATIC.RESULT.FAIL}" v-if="game.resultsFinal != STATIC.RESULT.UNDO">
-            {{game.resultMessage}}
+        <div class="game-result-message" :class="{fail: isFail}" v-if="game.resultsFinal != STATIC.RESULT.UNDO">
+            <span>{{game.resultMessage}}</span>
+
+            <div class="win-back-btn" @click="onClickBackToSuccess" v-if="game.resultsAssassinated && isFail">Back</div>
+            <div class="assassinate-btn" @click="onClickAssassinate" v-else>Assassinate</div>
         </div>
     </div>
 </template>
@@ -39,6 +42,7 @@ export default {
         };
     },
     computed: {
+        ...mapGetters(['gameEnd']),
         ...mapState(['game']),
         error(self) {
             switch (true) {
@@ -51,13 +55,20 @@ export default {
             const round = self.game.round - 1;
             return self.game.tracks[round].opportunities;
         },
+        isFail(self) {
+            return self.game.resultsFinal == STATIC.RESULT.FAIL;
+        },
     },
     mounted() {
         
     },
     methods: {
-        
-        
+        onClickAssassinate() {
+            this.$store.dispatch('GAME_ASSASSINATE', true);
+        },
+        onClickBackToSuccess() {
+            this.$store.dispatch('GAME_ASSASSINATE', false);
+        },
     },
     components: {
         

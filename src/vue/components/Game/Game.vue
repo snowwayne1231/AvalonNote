@@ -6,7 +6,7 @@
         </div>
 
         <div class="game-top">
-            <PlayerGrid />
+            <PlayerGrid ref="grid" :sendMission="SendMissionWithPlayerIdx"/>
             <Mission ref="mission" v-if="game.leader >= 0" />
             <Result ref="result" />
         </div>
@@ -17,11 +17,11 @@
             <b class="btn btn-empty vertical-center" ></b>
             <b class="btn btn-empty vertical-center" ></b>
             <b class="btn btn-next vertical-center" @click="onClickNext" v-if="!gameEnd">NEXT</b>
-            <b class="btn btn-next vertical-center" v-else></b>
+            <b class="btn btn-save vertical-center" :class="{show: allPlayerHasRole}" @click="onClickSave" v-else>SAVE</b>
         </div>
 
         <modal class="game-modal" name="modal-winorlose"
-            :width="340"
+            :width="320"
             :height="400">
             <b class="btn btn-win vertical-center" @click="onClickModalWin">WIN</b>
             <b class="btn btn-lose vertical-center" @click="onClickModalLose">LOSE</b>
@@ -49,9 +49,11 @@ export default {
     computed: {
         ...mapState(['game']),
         ...mapGetters(['gameVotesNow', 'gameGoPlayerNum', 'gameEnd']),
+        allPlayerHasRole(self) {
+            return self.game.players.filter(e => e.role < 0).length === 0;
+        },
     },
     mounted() {
-        console.log('game.vue', this);
         console.log('GAME', this.game);
         // window.addEventListener('touchmove', function(evt) {
         //     evt.preventDefault();
@@ -96,6 +98,15 @@ export default {
                 this.$refs.mission.startRound(this.game.round);
                 this.$modal.hide('modal-winorlose');
             });
+        },
+        onClickSave() {
+            
+            this.$store.dispatch('GAME_SAVE_TO_HISTORY').then(() => {
+
+            });
+        },
+        SendMissionWithPlayerIdx(idx) {
+            this.$refs.mission.setSendWithPlayerIdx(idx);
         },
     },
     components: {

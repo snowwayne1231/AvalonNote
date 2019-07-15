@@ -1,20 +1,21 @@
 <template>
     <div class="game-player-grid">
         
-        <Curtain class="grid-left" :players="leftPlayers" :hasLeader="hasLeader" :clickInfo="onClickInfo" />
+        <Curtain class="grid-left" :players="leftPlayers" :hasLeader="hasLeader" :clickInfo="onClickInfo" :sendMission="sendMission" />
         
-        <Curtain class="grid-right" :players="rightPlayers" :hasLeader="hasLeader" :clickInfo="onClickInfo" />
+        <Curtain class="grid-right" :players="rightPlayers" :hasLeader="hasLeader" :clickInfo="onClickInfo" :sendMission="sendMission" />
 
         <modal name="modal-info"
             class="game-modal" 
             :width="300"
             :height="540">
-            <div class="header">{{playerInfo.name}}
+            <div class="header">
+                <span class="name" @click="onClickProfileName">{{playerInfo.name}}</span>
                 <i class="close" @click="onClickCloseModal">x</i>
             </div>
             <div class="tabs">
                 <b class="tab-vote btn vertical-center" :class="{active: mywatch==1}" @click="onClickTab(1)">Voting</b>
-                <b class="tab-possible btn vertical-center" :class="{active: mywatch==2}" @click="onClickTab(2)">Possible</b>
+                <b class="tab-possible btn vertical-center" :class="{active: mywatch==2}" @click="onClickTab(2)" v-if="!gameEnd">Possible</b>
                 <b class="tab-besend btn vertical-center" :class="{active: mywatch==3}" @click="onClickTab(3)">Be Send</b>
             </div>
             <div class="content" v-touch:swipe="swipeHandler">
@@ -32,9 +33,9 @@
                                     <td :class="{win: item.win, lose: item.lose}">{{item.round}}</td>
                                     <td>
                                         <div class="vote-round" :class="{last: (idx + 1) == item.vote.length}" v-for="(vote, idx) in item.vote" :key="idx">
-                                            <div class="vote-go-leader vertical-center" :class="{self: vote.leader == playerInfo.name}" @click="onClickPlayer(vote.leader)">{{vote.leader}}</div>
+                                            <div class="vote-go-leader vertical-center" :class="{self: vote.leader.id == playerInfo.id}" @click="onClickPlayer(vote.leader.name)">{{vote.leader.name}}</div>
                                             <div class="vote-go-players">
-                                                <p class="player" :class="{self: player == playerInfo.name, leader: player == vote.leader}" v-for="(player, pi) in vote.players" :key="pi" @click="onClickPlayer(player)">{{player}}</p>
+                                                <p class="player" :class="{self: player.id == playerInfo.id, leader: player.id == vote.leader.id, isbad: player.goodRatio == 0}" v-for="(player, pi) in vote.players" :key="pi" @click="onClickPlayer(player)">{{player.name}}</p>
                                             </div>
                                             <div class="vote-go-vote" :class="{in: vote.insideDisagree, out: vote.outsideAgree}">
                                                 <span class="vote" :class="{agree: vote.agree}">
@@ -49,7 +50,15 @@
                         </table>
                     </div>
 
-                    <div class="content-possible" v-if="mywatch==2">
+                    <div class="content-possible" v-if="mywatch==2 && !gameEnd">
+
+                        <div class="good-ratio">
+                            <div class="ratio-bar" v-touch:moving="onRatioMoving" v-touch:end="onRatioEnd">
+                                <div class="bar-inner bad"></div>
+                                <div class="ratio-bar-inner"><div class="ratio" :style="{width: `${playerInfo.goodRatio}%`}"></div></div>
+                                <div class="bar-inner good"></div>
+                            </div>
+                        </div>
                         <div class="role-possible">
                             <div v-for="role in rolePossibles"
                                 :key="role.key"
@@ -64,19 +73,22 @@
                         <div class="left">
                             <div class="player"
                                 :class="{self: player.name === playerInfo.name}"
-                                v-for="player in leftPlayers" 
+                                v-for="player in leftPlayers"
+                                @click="onClickPlayer(player.name)"
                                 :key="player.id">
-                                <div class="name" @click="onClickPlayer(player.name)">{{player.name}}</div>
+                                <div class="name" :class="{isbad: player.goodRatio == 0}">{{player.name}}</div>
                                 <div class="voting" v-if="playerInfo.beSendVoteCounting[player.id] && playerInfo.id != player.id">
                                     <div class="agree">
                                         <span class="circle">
                                             {{playerInfo.beSendVoteCounting[player.id].agree.total}}
                                         </span>
+                                        <span>{{playerInfo.beSendVoteCounting[player.id].agree.out}}</span>
                                     </div>
                                     <div class="disagree">
                                         <span class="circle">
                                             {{playerInfo.beSendVoteCounting[player.id].disagree.total}}
                                         </span>
+                                        <span>{{playerInfo.beSendVoteCounting[player.id].disagree.in}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -116,19 +128,22 @@
                         <div class="right">
                             <div class="player"
                                 :class="{self: player.name === playerInfo.name}"
-                                v-for="player in rightPlayers" 
+                                v-for="player in rightPlayers"
+                                @click="onClickPlayer(player.name)"
                                 :key="player.id">
-                                <div class="name" @click="onClickPlayer(player.name)">{{player.name}}</div>
+                                <div class="name" :class="{isbad: player.goodRatio == 0}">{{player.name}}</div>
                                 <div class="voting" v-if="playerInfo.beSendVoteCounting[player.id] && playerInfo.id != player.id">
                                     <div class="agree">
                                         <span class="circle">
                                             {{playerInfo.beSendVoteCounting[player.id].agree.total}}
                                         </span>
+                                        <span>{{playerInfo.beSendVoteCounting[player.id].agree.out}}</span>
                                     </div>
                                     <div class="disagree">
                                         <span class="circle">
                                             {{playerInfo.beSendVoteCounting[player.id].disagree.total}}
                                         </span>
+                                        <span>{{playerInfo.beSendVoteCounting[player.id].disagree.in}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -147,6 +162,9 @@ import Curtain from './_GridCurtain';
 import {STATIC} from 'src/vuex/modules/game';
 
 export default {
+    props: {
+        sendMission: Function,
+    },
     data() {
         return {
             playerInfo: {
@@ -157,6 +175,7 @@ export default {
                 votes: [],
                 beSend: [],
                 beSendVoteCounting: [],
+                goodRatio: 0,
             },
             mywatch: 1,
             roleMap: {},
@@ -164,6 +183,7 @@ export default {
     },
     computed: {
         ...mapState(['game']),
+        ...mapGetters(['gameEnd']),
         playerGrid(self) {
             // const basic = {
             //     'besended': false,
@@ -219,11 +239,18 @@ export default {
         this.roleMap = nextRole;
 
     },
+    // updated() {
+    //     const now = new Date().getTime();
+    //     console.log('update timestramp', now - this._timestamp);
+    //     this._timestamp = now;
+    // },
     methods: {
         onClickInfo(player, specifyWatch) {
             // console.log('player', player);
             if (specifyWatch) {
-                this.mywatch = specifyWatch;
+                this.mywatch = specifyWatch == 2 && this.gameEnd
+                    ? 1
+                    : specifyWatch;
             }
 
             const player_idx = player.id;
@@ -240,15 +267,12 @@ export default {
                     round: idx + 1,
                     win: result[idx] === STATIC.RESULT.SUCCESS,
                     lose: result[idx] === STATIC.RESULT.FAIL,
-                    go_leader: ele.go_leader_idx >= 0 ? playerMap[ele.go_leader_idx].name : '',
-                    go_track_round: ele.go_round,
-                    go_players: ele.go_players.map(p => playerMap[p].name),
                     vote: filterOp.map(e => {
                         const agree = !!e.votes[player_idx];
                         const included = e.players.includes(player_idx);
                         return {
-                            leader: playerMap[e.leader_idx].name,
-                            players: e.players.map(p => playerMap[p].name),
+                            leader: playerMap[e.leader_idx],
+                            players: e.players.map(p => playerMap[p]),
                             agree,
                             outsideAgree: agree && !included,
                             insideDisagree: !agree && included,
@@ -309,13 +333,14 @@ export default {
 
             this.playerInfo.id = player_info.id;
             this.playerInfo.name = player_info.name;
+            this.playerInfo.goodRatio = player_info.goodRatio;
             this.playerInfo.table = this.game.tablePlayer.findIndex(e => e == player_info.id);
             this.playerInfo.isLeftTable = this.playerInfo.table < 5;
             this.playerInfo.votes = votes;
             this.playerInfo.beSend = beSend;
             this.playerInfo.beSendVoteCounting = beSendVoteCounting;
 
-            console.log(this.playerInfo);
+            console.log('Modal playerInfo', this.playerInfo);
 
             this.$modal.show('modal-info');
         },
@@ -346,6 +371,20 @@ export default {
         onClickCloseModal() {
             this.$modal.hide('modal-info');
         },
+        onClickProfileName() {
+            // console.log(this.playerInfo);
+            const enter = window.prompt('Enter The Name You Wanna Change', '');
+
+            if (!enter == null) return;
+
+            if (!enter) { return window.alert('Please Enter The Right Name'); }
+
+            this.playerInfo.name = enter;
+            this.$store.dispatch('GAME_EDIT_PLAYER_NAME', {
+                idx: this.playerInfo.id,
+                name: enter,
+            });
+        },
         swipeHandler(mode, evt) {
             // console.log(mode, evt);
             const int = mode == 'left'
@@ -354,6 +393,23 @@ export default {
                     ? -1
                     : 0;
             this.mywatch = ((this.mywatch + int) % 3) || 3;
+        },
+        onRatioMoving(evt) {
+            evt.stopPropagation();
+            const nowX = evt.touches[0].clientX;
+            if (this._tmpRatioX > 0) {
+                let change = Math.min(Math.round((nowX - this._tmpRatioX) / 2), 5);
+                // console.log('change', change);
+                this.playerInfo.goodRatio = Math.max(Math.min(this.playerInfo.goodRatio + change, 100), 0);
+            }
+            this._tmpRatioX = nowX;
+        },
+        onRatioEnd(evt) {
+            this._tmpRatioX = 0;
+            this.$store.dispatch('GAME_CHANGE_GOOD_RATIO', {
+                player_idx: this.playerInfo.id,
+                value: this.playerInfo.goodRatio,
+            });
         },
         getSvgPlayerPoint(xy = 'x', player = null) {
             const self = player == null || player.id == this.playerInfo.id;

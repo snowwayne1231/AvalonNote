@@ -4,8 +4,11 @@
             <b class="btn vertical-center" @click="onClickNext">Start New Game</b>
             <b class="btn vertical-center" :class="{disable: !preJSON}" @click="onClickLoading">Loading Previous Game</b>
             <b class="btn vertical-center" :class="{disable: game.heros.length == 0}" @click="onClickReturn">Return To Game</b>
+            <b class="btn vertical-center" :class="{disable: !preJSON}" @click="onClickHistory">Histories</b>
+
+            <div class="setting-backup" @click="onClickOutputFile">Backup</div>
         </div>
-        <div class="setting-step-2">
+        <div class="setting-step-2" v-show="mode == 1">
             <table>
                 <tbody>
                     <tr>
@@ -56,6 +59,10 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="setting-history" v-if="mode === 9">
+            <GameHistory :close="onCloseHistory" />
+        </div>
     </div>
 </template>
 
@@ -63,6 +70,7 @@
 import './GameSetting.scss';
 import {mapState, mapGetters} from 'vuex';
 import Multiselect from 'vue-multiselect';
+import GameHistory from 'src/vue/components/GameHistory/GameHistory';
 import { STATIC } from 'src/vuex/modules/game';
 
 export default {
@@ -71,7 +79,7 @@ export default {
             mode: 0,
             preJSON: null,
             player: 5,
-            game_order: 1,
+            game_order: -1,
             game_order_options: [{display: 'Clockwise', value: 1}, {display: 'CounterClockwise', value: -1}],
             role_selected: null,
             role_options: [],
@@ -87,7 +95,7 @@ export default {
         this.preJSON = !!localStorage.getItem(STATIC.LOCALSTORAGE);
 
         this.role_options = Object.keys(STATIC.ROLE)
-        .filter(key => key != 'CITIZEN' && key != 'MINIONS')
+        .filter(key => key != 'CITIZEN' && key != 'MINIONS' && !key.match('LANCELOT_'))
         .map(key => {
             return {display: key, value: STATIC.ROLE[key], isGood: STATIC.ROLE[key] < 10, isLance: STATIC.ROLE[key] >= 20};
         });
@@ -149,9 +157,24 @@ export default {
         onClickReturn() {
             this.$store.dispatch('GAME_RESTART');
         },
+        onClickHistory() {
+            this.mode = 9;
+        },
+        onCloseHistory() {
+            this.mode = 0;
+        },
+        onClickOutputFile() {
+            const a = document.createElement("a");
+            const histories = window.localStorage.getItem(STATIC.LOCALHISTORY);
+            const file = new Blob([histories], {type: 'text/plain'});
+            a.href = URL.createObjectURL(file);
+            a.download = `avalon_state_backup_${new Date().getTime()}`;
+            a.click();
+        },
     },
     components: {
         Multiselect,
+        GameHistory,
     },
 }
 </script>

@@ -14,7 +14,7 @@
     .setting-step-1 {
         position: absolute;
         box-sizing: border-box;
-        padding: 90px 20px;
+        padding: 20px;
         width: 100%;
         height: 100%;
         left: 0%;
@@ -60,12 +60,16 @@
             font-size: 20px;
         }
     }
+
+    .setting-history {
+        height: 100%;
+    }
     
     .btn {
         font-size: 18px;
         height: 60px;
         display: block !important;
-        margin: 40px auto;
+        margin: 40px auto 0px;
         color: #fff9a8;
         border: 2px #f9ff00 outset;
         background-color: #0c0b0b;
@@ -151,5 +155,17 @@
             visibility: hidden;
             display: none;
         }
+    }
+
+    .setting-backup {
+        position: absolute;
+        height: 36px;
+        line-height: 36px;
+        width: 70px;
+        bottom: 0px;
+        right: 0px;
+        color: #fff;
+        text-align: center;
+        border: 2px outset gray;
     }
 }
