@@ -7,16 +7,12 @@ const Dotenv = require('dotenv-webpack');
 
 const dir_src = path.resolve(__dirname, 'src');
 const dir_dist = path.resolve(__dirname, 'www');
-const isProduction = false;
+const isProduction = true;
 
-console.log('is development');
+console.log('Is Production :: ', isProduction);
 
 module.exports = {
-    mode: 'development',
-    devtool: 'inline-source-map',
-    devServer: {
-        contentBase: dir_dist,
-    },
+    mode: isProduction ? 'production' : 'development',
 
     entry: `${dir_src}/index.js`,
     output: {
@@ -92,6 +88,16 @@ module.exports = {
         }),
     ],
     optimization: {
-        
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                test: /\.(vue|js).?$/i,
+                terserOptions: {
+                    output: {
+                        comments: false
+                    }
+                }
+            }),
+        ],
     },
 };

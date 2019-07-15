@@ -82,11 +82,10 @@ export default {
             if (evt.added) {
                 this.voteAgree(idx);
             } else {
-                this.$store.dispatch('GAME_TOGGLE_VOTE', {
-                    idx: this.getPlayerIdByCardIndex(idx),
-                });
+                // this.$store.dispatch('GAME_TOGGLE_VOTE', {
+                //     idx: this.getPlayerIdByCardIndex(idx),
+                // });
             }
-            
         },
         voteAgree(idx) {
             this.$store.dispatch('GAME_VOTE_AGREE', {

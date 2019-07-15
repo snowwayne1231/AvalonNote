@@ -219,6 +219,11 @@
 
     .game-modal {
 
+        .inner-content {
+            height: 100%;
+            overflow: auto;
+        }
+
         .header {
             height: 8%;
             line-height: 44px;
@@ -445,6 +450,7 @@
 
         .content-besend {
             min-height: 420px;
+            height: 100%;
             display: flex;
 
             >div:not(.center) {
@@ -455,6 +461,9 @@
 
             .center {
                 flex: 2;
+                height: 100%;
+                width: 100%;
+                position: relative;
             }
 
             .player {
