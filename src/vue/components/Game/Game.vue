@@ -79,6 +79,7 @@ export default {
                 this.$store.dispatch('GAME_SAVE_OPPORTUNITIES', {
                     players: sendingPlayers,
                 });
+                this.$refs.mission.resetCard();
             }
         },
         onClickModalCancel() {

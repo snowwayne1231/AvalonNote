@@ -39,6 +39,7 @@ export default {
                 }];
             }),
             tableIndexMap: [0,5,1,6,2,7,3,8,4,9],
+            round: 1,
         };
     },
     computed: {
@@ -93,14 +94,18 @@ export default {
             });
         },
         startRound(round = 1) {
-            const cardNum = this.game.mission[round - 1];
+            this.round = round;
+            this.resetCard();
+        },
+        resetCard() {
+            const cardNum = this.game.mission[this.round - 1];
             const playerNum = this.game.playerNum;
             const overIdx = this.missionCardItems.length - 1 - cardNum;
             this.missionCardItems = this.missionCardItems.map((ele, idx) => {
                 return playerNum > idx || idx > 9
                 ? [{sended: idx > overIdx ? true : false}]
                 : [{disable: true}];
-            })
+            });
         },
         getPlayers() {
             const tableMap = this.tableIndexMap;

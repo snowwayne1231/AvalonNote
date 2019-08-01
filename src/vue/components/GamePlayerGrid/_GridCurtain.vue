@@ -4,7 +4,7 @@
             <div class="profile-info display-inline-vertical" v-touch:swipe="onSwipeInfo(player.id, player.goodRatio)">
                 <b v-if="player.id == game.leader && !gameEnd" class="show-leader btn-leader vertical-center" @click="onClickInfo(player)">W</b>
                 <div v-if="player.name" class="name" @click="onClickProfile(player)" v-touch:longtap="onLongtapProfile" :class="{editor: game.editPlayerMode, editing: game.tmp_change_player && game.tmp_change_player.id == player.id}">
-                    <span>{{player.name}}</span>
+                    <span>{{player.name}} <b class="howbad" v-show="player.howbad > 0 && player.goodRatio > 0">{{player.howbad}}</b></span>
                     <span class="role-ratio">
                         <i class="ball good" v-if="player.good"></i>
                         <i class="ball bad" v-if="player.bad"></i>
@@ -16,7 +16,7 @@
                 <div class="tools" v-if="hasLeader">
                     <div class="vote" :class="{agree: player.isAgree}"
                         @click="onClickVote(player)"></div>
-                    <div class="role" @click="onClickInfo(player)">i</div>
+                    <!-- <div class="role" @click="onClickInfo(player)">i</div> -->
                 </div>
                 <div v-else>
                     <b class="btn btn-leader vertical-center" @click="onClickLeader(player)">W</b>
@@ -67,15 +67,55 @@ export default {
             // console.log('opportunities', opportunities);
             return opportunities;
         },
+        allBeforeOpportunities(self) {
+            const tracks = self.game.tracks;
+            // console.log('playersWithData tracks', tracks);
+            let _opportunities = [];
+            tracks.map(t => {
+                const _next = t.opportunities.filter(o => o.leader_idx >= 0)
+                if (_next.length > 0) {
+                    _opportunities = _opportunities.concat(_next);
+                }
+            });
+            return _opportunities;
+        },
         thisRoundVotes(self) {
             return self.opportunities.votes;
             // self.votes[gameRound].track
         },
         playersWithData(self) {
             
+            const gamePlayers = self.game.players;
+            const _badPlayers = [];
+            gamePlayers.map(p => {
+                if (p.goodRatio == 0) {
+                    _badPlayers.push(p.id);
+                }
+            });
+            const badScores = new Array(gamePlayers.length).fill(0);
+            self.allBeforeOpportunities.map(op => {
+                const hasBad = op.players.some(p => _badPlayers.includes(p));
+                if (hasBad) {
+                    op.votes.map((v,id) => {
+                        if (v == 1) {
+                            badScores[id]+= op.players.includes(id) ? 1 : 2;
+                        }
+                    });
+                } else {
+
+                }
+            });
+            const minBadScore = Math.min.apply(null, badScores);
+
+            
+            // console.log('playersWithData allBeforeOpportunities', self.allBeforeOpportunities);
+            // console.log('playersWithData _badPlayers', _badPlayers, badScores);
+            // console.log('playersWithData players', self.players);
+            
             return self.players.map(p => {
                 const possbile = self.game.role_possible[p.id];
                 const marks = {};
+                const howbad = badScores[p.id] - minBadScore;
                 if (Array.isArray(possbile)) {
                     possbile.map(e => {
                         switch (true){
@@ -89,6 +129,7 @@ export default {
                 return p.name 
                 ? {
                     isAgree: self.isAgree(p),
+                    howbad,
                     ...marks, 
                     ...p,
                 }
@@ -256,6 +297,7 @@ export default {
             }
         },
         onLongtapProfile(evt) {
+            evt.preventDefault();
             if (!this.gameEnd) {
                 this.$store.dispatch('GAME_TOGGLE_EDIT_PLAYER_MODE');
             }
